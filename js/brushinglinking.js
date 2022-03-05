@@ -26,11 +26,14 @@ let brush2;
 let myCircles2;
 
 //TODO: append svg object to the body of the page to house bar chart 
-
+const svg3 = d3.select("#vis-holder")
+                .append("svg")
+                .attr("width", width - margin.left - margin.right)
+                .attr("height", height - margin.top - margin.bottom)
+                .attr("viewBox", [0, 0, width, height]); 
 
 //TODO: Initialize bars. We will need these to be global. 
- 
-
+let myBars;
 
 // Define color scale
 const color = d3.scaleOrdinal()
@@ -138,7 +141,7 @@ d3.csv("data/iris.csv").then((data) => {
                       .text(xKey2)
       );
 
-    // Finx max y 
+    // Find max y 
     let maxY2 = d3.max(data, (d) => { return d[yKey2]; });
 
     // Create Y scale
@@ -179,8 +182,70 @@ d3.csv("data/iris.csv").then((data) => {
 
   //TODO: Barchart with counts of different species
   {
-    // Bar chart code here 
-  }
+    let xKey3 = "Count";
+    let yKey3 = "Species";
+   
+    const groupCounts = [
+        {species: 'setosa', count: 50},
+        {species: 'versicolor', count: 50},
+        {species: 'virginica', count: 50},
+    ];
+
+    // Finding the maximum score value
+    let maxY3 = d3.max(groupCounts, function(d) { return d.count; });
+
+    // Creates a Y scale based on MaxY value  
+    let yScale3 = d3.scaleLinear()
+                .domain([0,maxY3])
+                .range([height-margin.bottom,margin.top]); 
+
+    // creates an X scale based on number of data entries
+    let xScale3 = d3.scaleBand()
+                .domain(d3.range(groupCounts.length))
+                .range([margin.left, width - margin.right])
+                .padding(0.1); 
+
+    // Adding Y axis 
+    svg3.append("g")
+       .attr("transform", `translate(${margin.left}, 0)`) 
+       .call(d3.axisLeft(yScale3)) 
+       .attr("font-size", '20px')
+        .call((g) => g.append("text")
+                      .attr("x",- 4)
+                      .attr("y", margin.top - 12)
+                      .attr("fill", "black")
+                      .attr("text-anchor", "end")
+                      .text(yKey3)); 
+
+    // Adding X axis
+    svg3.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`) 
+        .call(d3.axisBottom(xScale3) 
+                .tickFormat(i => groupCounts[i].species))  
+        .attr("font-size", '20px')
+        .call((g) => g.append("text")
+                      .attr("x", width - margin.right)
+                      .attr("y", margin.bottom - 4)
+                      .attr("fill", "black")
+                      .attr("text-anchor", "end")
+                      .text(xKey3));
+
+// Add bars to the bar chart and connects them to the data
+    svg3.selectAll(".bar") 
+       .data(groupCounts) 
+       .enter()  
+       .append("rect") 
+         .attr("class", "bar") 
+         .attr("x", (d,i) => xScale3(i)) 
+         .attr("y", (d) => yScale3(d.count)) 
+         .attr("height", (d) => (height - margin.bottom) - yScale3(d.count)) 
+         .attr("width", xScale3.bandwidth()) 
+         .style("fill", (d) => color(d.species))
+
+
+         
+};
+  })
 
   //Brushing Code---------------------------------------------------------------------------------------------
     
@@ -227,4 +292,4 @@ d3.csv("data/iris.csv").then((data) => {
         y1 = brush_coords[1][1];
       return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
     }
-});
+;
