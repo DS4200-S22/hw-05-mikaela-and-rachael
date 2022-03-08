@@ -4,7 +4,7 @@ body {
 }
 
 .selected {
-  opacity: 1;
+  opacity: 1 !important;
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 3px;
 }
