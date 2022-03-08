@@ -14,14 +14,14 @@ const svg1 = d3.select("#vis-holder")
 let brush1; 
 let myCircles1; 
 
-//TODO: append svg object to the body of the page to house Scatterplot2 (call it svg2)
+// Append svg object to the body of the page to house Scatterplot2 
 const svg2 = d3.select("#vis-holder")
                 .append("svg")
                 .attr("width", width - margin.left - margin.right)
                 .attr("height", height - margin.top - margin.bottom)
                 .attr("viewBox", [0, 0, width, height]); 
 
-//TODO: Initialize brush for Scatterplot2 and points. We will need these to be global.
+// Initialize brush for Scatterplot2 and points. We will need these to be global.
 let brush2; 
 let myCircles2;
 
@@ -284,17 +284,22 @@ d3.csv("data/iris.csv").then((data) => {
     brushSelection = brushEvent.selection
 
     //TODO: Start an empty set that you can store names of selected species in 
-    selectedSpecies = []
+    let selectedSpecies = new Set()
 
     //TODO: Give bold outline to all points within the brush region in Scatterplot2 & collected names of brushed species
-    myCircles2.classed("selected", function(d){ return isBrushed(brushSelection, x2(d[xKey2]), y2(d[yKey2]))});
-
+    myCircles2.classed("selected", function(d){ 
+      if (isBrushed(brushSelection, x2(d[xKey2]), y2(d[yKey2])))
+      {
+        selectedSpecies.add(d.Species)
+      }
+      return isBrushed(brushSelection, x2(d[xKey2]), y2(d[yKey2]))
+    });
+    
     //TODO: Give bold outline to all points in Scatterplot1 corresponding to points within the brush region in Scatterplot2
     myCircles1.classed("selected", function(d){ return isBrushed(brushSelection, x2(d[xKey2]), y2(d[yKey2]))});
-
+  
     //TODO: Give bold outline to all bars in bar chart with corresponding to species selected by Scatterplot2 brush
-    myBars.classed("selected", function(d){ return });
-
+    myBars.classed("selected", function(d){ return selectedSpecies.has(d.species)});
   }
 
     //Finds dots within the brushed region
